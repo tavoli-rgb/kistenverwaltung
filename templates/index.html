@@ -4,160 +4,28 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Index</title>
-    <style>
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: #f0f2f5;
-            color: #333;
-        }
-        .container {
-            max-width: 2560px; /* Adjusted for widescreen */
-            margin: 0 auto;
-            padding: 20px;
-        }
-        .highlight {
-            border: 2px solid #ff9800;
-            background-color: #fff3e0;
-        }
-        table {
-            border-collapse: collapse;
-            width: 100%;
-            margin-bottom: 20px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            background-color: #fff;
-            border-radius: 8px;
-            overflow: hidden;
-        }
-        th, td {
-            padding: 15px;
-            text-align: center;
-            border-bottom: 1px solid #ddd;
-        }
-        th {
-            background-color: #ff5722;
-            color: white;
-        }
-        tr:nth-child(even) {
-            background-color: #f9f9f9;
-        }
-        tr:nth-child(odd) {
-            background-color: #fff;
-        }
-        .form-container {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            margin-bottom: 20px;
-        }
-        .form-container form {
-            display: flex;
-            align-items: center;
-            margin-bottom: 10px;
-        }
-        .form-container input {
-            width: 300px;
-            height: 2em;
-            margin-right: 10px;
-            padding: 5px;
-            font-size: 1em;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-        }
-        .form-container button {
-            padding: 10px 20px;
-            font-size: 1em;
-            color: white;
-            background-color: #ff5722;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            transition: background-color 0.3s;
-        }
-        .form-container button:hover {
-            background-color: #e64a19;
-        }
-        .message {
-            padding: 10px;
-            background-color: #fff3e0;
-            border: 1px solid #ff9800;
-            color: #333;
-            margin-top: 20px;
-            text-align: center;
-            border-radius: 4px;
-        }
-        a {
-            color: #ff5722;
-            text-decoration: none;
-        }
-        a:hover {
-            text-decoration: underline;
-        }
-        .eurobox {
-            width: 100%;
-            height: 100px;
-            background-color: #cfd8dc;
-            border: 2px solid #607d8b;
-            border-radius: 4px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.2em;
-            color: #333;
-        }
-        td {
-            width: 10%; /* Ensure all boxes are the same width */
-            position: relative;
-        }
-        .divider {
-            position: absolute;
-            top: 0;
-            bottom: 0;
-            width: 2px;
-            background-color: #ff5722; /* Same color as the row headers */
-            right: 0; /* Position at the right edge of the cell */
-        }
-        @media (min-width: 2560px) {
-            .container {
-                max-width: 2560px;
-            }
-        }
-    </style>
-    <script>
-        window.onload = function() {
-            document.getElementById('projektnummer').focus();
-        };
-    </script>
 </head>
 <body>
-    <div class="container">
-        <h1>Index</h1>
-        <div class="form-container">
-            <form action="{{ url_for('find_box') }}" method="post">
-                <input type="text" name="projektnummer" placeholder="Projektnummer" required>
-                <button type="submit">Find Box</button>
-            </form>
-            <div class="message">{% if message %}{{ message }}{% endif %}</div>
-        </div>
-        <div class="table-container">
-            <table>
-                <tr>
-                    <th>Projektnummer</th>
-                    <th>Kunde</th>
-                    <th>Reihe</th>
-                    <th>Fach</th>
-                </tr>
-                {% for box in boxes %}
-                <tr>
-                    <td>{{ box[0] }}</td>
-                    <td>{{ box[1] }}</td>
-                    <td>{{ box[2] }}</td>
-                    <td>{{ box[3] }}</td>
-                </tr>
-                {% endfor %}
-            </table>
-        </div>
-    </div>
+    <h1>Index</h1>
+    <form action="{{ url_for('find_box') }}" method="post">
+        <input type="text" name="projektnummer" placeholder="Projektnummer" required>
+        <button type="submit">Find Box</button>
+    </form>
+    <table>
+        <tr>
+            <th>Projektnummer</th>
+            <th>Kunde</th>
+            <th>Reihe</th>
+            <th>Fach</th>
+        </tr>
+        {% for box in boxes %}
+        <tr>
+            <td>{{ box[0] }}</td>
+            <td>{{ box[1] }}</td>
+            <td>{{ box[2] }}</td>
+            <td>{{ box[3] }}</td>
+        </tr>
+        {% endfor %}
+    </table>
 </body>
 </html>
