@@ -1,8 +1,9 @@
 <!DOCTYPE html>
-<html lang="de">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Kistenverwaltung</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Index</title>
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -131,33 +132,28 @@
 </head>
 <body>
     <div class="container">
+        <h1>Index</h1>
         <div class="form-container">
-            <form action="/find" method="post">
-                <input type="text" id="projektnummer" name="projektnummer" placeholder="Projektnummer">
-                <button type="submit">Suchen</button>
+            <form action="{{ url_for('find_box') }}" method="post">
+                <input type="text" name="projektnummer" placeholder="Projektnummer" required>
+                <button type="submit">Find Box</button>
             </form>
             <div class="message">{% if message %}{{ message }}{% endif %}</div>
         </div>
         <div class="table-container">
             <table>
-                {% for reihe in range(5, 0, -1) %}
                 <tr>
-                    <th>{{ reihe }}</th>
-                    {% for fach in range(10, 0, -1) %}
-                    <td class="{% if highlight and highlight[0] == reihe and highlight[1] == fach %}highlight{% endif %}">
-                        <div class="eurobox">
-                            {% for location in storage_locations %}
-                                {% if location[1] == reihe and location[2] == fach %}
-                                    {{ location[0] }}
-                                {% endif %}
-                            {% endfor %}
-                        </div>
-                        {% if fach % 2 == 1 and fach != 1 %}
-                        <div class="divider"></div>
-                        {% endif %}
-                    </td>
-                    {% endfor %}
-                    <th>{{ reihe }}</th>
+                    <th>Projektnummer</th>
+                    <th>Kunde</th>
+                    <th>Reihe</th>
+                    <th>Fach</th>
+                </tr>
+                {% for box in boxes %}
+                <tr>
+                    <td>{{ box[0] }}</td>
+                    <td>{{ box[1] }}</td>
+                    <td>{{ box[2] }}</td>
+                    <td>{{ box[3] }}</td>
                 </tr>
                 {% endfor %}
             </table>

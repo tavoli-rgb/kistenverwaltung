@@ -60,72 +60,6 @@ def find_box():
     else:
         return "Database connection failed."
 
-@app.route('/add', methods=['POST'])
-def add_box():
-    projektnummer = request.form['projektnummer']
-    kunde = request.form['kunde']
-    lagerplatz_id = request.form['lagerplatz_id']
-    conn = get_db_connection()
-    if conn:
-        cursor = conn.cursor()
-        cursor.execute("""
-            INSERT INTO boxes (projektnummer, kunde, lagerplatz_id)
-            VALUES (%s, %s, %s)
-        """, (projektnummer, kunde, lagerplatz_id))
-        conn.commit()
-        cursor.close()
-        conn.close()
-        return redirect(url_for('index'))
-    else:
-        return "Database connection failed."
-
-@app.route('/edit', methods=['POST'])
-def edit_box():
-    projektnummer = request.form['projektnummer']
-    kunde = request.form['kunde']
-    lagerplatz_id = request.form['lagerplatz_id']
-    conn = get_db_connection()
-    if conn:
-        cursor = conn.cursor()
-        cursor.execute("""
-            UPDATE boxes
-            SET kunde = %s, lagerplatz_id = %s
-            WHERE projektnummer = %s
-        """, (kunde, lagerplatz_id, projektnummer))
-        conn.commit()
-        cursor.close()
-        conn.close()
-        return redirect(url_for('index'))
-    else:
-        return "Database connection failed."
-
-@app.route('/delete', methods=['POST'])
-def delete_box():
-    projektnummer = request.form['projektnummer']
-    conn = get_db_connection()
-    if conn:
-        cursor = conn.cursor()
-        cursor.execute("DELETE FROM boxes WHERE projektnummer = %s", (projektnummer,))
-        conn.commit()
-        cursor.close()
-        conn.close()
-        return redirect(url_for('index'))
-    else:
-        return "Database connection failed."
-
-@app.route('/manage', methods=['GET', 'POST'])
-def manage_boxes():
-    conn = get_db_connection()
-    if conn:
-        cursor = conn.cursor()
-        boxes = fetch_boxes(cursor)
-        storage_locations = fetch_storage_locations(cursor)
-        cursor.close()
-        conn.close()
-        return render_template('manage.html', boxes=boxes, storage_locations=storage_locations, message=None, highlight=None)
-    else:
-        return "Database connection failed."
-
 @app.route('/find_manage', methods=['POST'])
 def find_box_manage():
     projektnummer = request.form['projektnummer']
@@ -151,12 +85,61 @@ def find_box_manage():
     else:
         return "Database connection failed."
 
-@app.route('/print_label/<projektnummer>/<kunde>/<reihe>/<fach>/<boxnummer>')
-def print_label(projektnummer, kunde, reihe, fach, boxnummer):
-    return render_template('print_label.html', projektnummer=projektnummer, kunde=kunde, reihe=reihe, fach=fach, boxnummer=boxnummer)
+@app.route('/add', methods=['POST'])
+def add_box():
+    projektnummer = request.form['projektnummer']
+    kunde = request.form['kunde']
+    lagerplatz_id = request.form['lagerplatz_id']
+    conn = get_db_connection()
+    if conn:
+        cursor = conn.cursor()
+        cursor.execute("""
+            INSERT INTO boxes (projektnummer, kunde, lagerplatz_id)
+            VALUES (%s, %s, %s)
+        """, (projektnummer, kunde, lagerplatz_id))
+        cursor.execute("UPDATE storage_locations SET belegt = TRUE WHERE id = %s", (lagerplatz_id,))
+        conn.commit()
+        cursor.close()
+        conn.close()
+        return redirect(url_for('manage_boxes'))
+    else:
+        return "Database connection failed."
+
+@app.route('/edit_box/<projektnummer>', methods=['GET', 'POST'])
+def edit_box(projektnummer):
+    if request.method == 'POST':
+        projektnummer = request.form['projektnummer']
+        kunde = request.form['kunde']
+        lagerplatz_id = request.form['lagerplatz_id']
+        conn = get_db_connection()
+        if conn:
+            cursor = conn.cursor()
+            cursor.execute("""
+                UPDATE boxes
+                SET kunde = %s, lagerplatz_id = %s
+                WHERE projektnummer = %s
+            """, (kunde, lagerplatz_id, projektnummer))
+            conn.commit()
+            cursor.close()
+            conn.close()
+            return redirect(url_for('manage_boxes'))
+        else:
+            return "Database connection failed."
+    else:
+        conn = get_db_connection()
+        if conn:
+            cursor = conn.cursor()
+            cursor.execute("SELECT projektnummer, kunde, lagerplatz_id FROM boxes WHERE projektnummer = %s", (projektnummer,))
+            box = cursor.fetchone()
+            storage_locations = fetch_storage_locations(cursor)
+            cursor.close()
+            conn.close()
+            return render_template('edit_box.html', box=box, storage_locations=storage_locations)
+        else:
+            return "Database connection failed."
 
 @app.route('/delete_box/<projektnummer>', methods=['POST'])
-def delete_box_route(projektnummer):
+def delete_box(projektnummer):
     conn = get_db_connection()
     if conn:
         cursor = conn.cursor()
@@ -182,29 +165,22 @@ def delete_box_route(projektnummer):
     else:
         return "Database connection failed."
 
-@app.route('/edit_box/<projektnummer>', methods=['GET', 'POST'])
-def edit_box_route(projektnummer):
-    if request.method == 'POST':
-        projektnummer = request.form['projektnummer']
-        kunde = request.form['kunde']
-        lagerplatz_id = request.form['lagerplatz_id']
-        conn = get_db_connection()
-        if conn:
-            cursor = conn.cursor()
-            cursor.execute("""
-                UPDATE boxes
-                SET kunde = %s, lagerplatz_id = %s
-                WHERE projektnummer = %s
-            """, (kunde, lagerplatz_id, projektnummer))
-            conn.commit()
-            cursor.close()
-            conn.close()
-            return redirect(url_for('index'))
-        else:
-            return "Database connection failed."
+@app.route('/manage', methods=['GET', 'POST'])
+def manage_boxes():
+    conn = get_db_connection()
+    if conn:
+        cursor = conn.cursor()
+        boxes = fetch_boxes(cursor)
+        storage_locations = fetch_storage_locations(cursor)
+        cursor.close()
+        conn.close()
+        return render_template('manage.html', boxes=boxes, storage_locations=storage_locations, message=None, highlight=None)
     else:
-        # Render form for editing box
-        pass
+        return "Database connection failed."
+
+@app.route('/print_label/<projektnummer>/<kunde>/<reihe>/<fach>/<boxnummer>')
+def print_label(projektnummer, kunde, reihe, fach, boxnummer):
+    return render_template('print_label.html', projektnummer=projektnummer, kunde=kunde, reihe=reihe, fach=fach, boxnummer=boxnummer)
 
 @app.route('/testansicht')
 def testansicht():
