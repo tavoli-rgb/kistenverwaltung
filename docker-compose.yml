@@ -8,7 +8,7 @@ services:
     volumes:
       - ./mysql-data:/var/lib/mysql
     ports:
-      - "3306:3306"
+      - "3307:3306"
 
   phpmyadmin:
     image: phpmyadmin
@@ -16,17 +16,18 @@ services:
       PMA_HOST: mysql
       MYSQL_ROOT_PASSWORD: example
     ports:
-      - "8088:80"
+      - "8089:80"
     depends_on:
       - mysql
 
-
-  flask:
-    build: .
+  flask_app:
+    build:
+      context: .
+      dockerfile: Dockerfile
     ports:
-      - "5002:5000"
-    volumes:
-      - .:/app
+      - "5003:5000"
+    environment:
+      - FLASK_ENV=development
     depends_on:
       - mysql
 
