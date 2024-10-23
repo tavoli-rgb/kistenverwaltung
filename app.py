@@ -45,12 +45,18 @@ def find_box():
         cursor = conn.cursor()
         cursor.execute("SELECT lagerplatz_id FROM boxes WHERE projektnummer = %s", (projektnummer,))
         location = cursor.fetchone()
-        cursor.close()
-        conn.close()
+        boxes = fetch_boxes(cursor)
+        storage_locations = fetch_storage_locations(cursor)
         if location:
-            return redirect(url_for('index', highlight=location[0]))
+            cursor.execute("SELECT fach, reihe FROM storage_locations WHERE id = %s", (location[0],))
+            place = cursor.fetchone()
+            cursor.close()
+            conn.close()
+            return render_template('index.html', message=f"Kiste mit Projektnummer {projektnummer} befindet sich an Fach {place[0]}, Reihe {place[1]}", highlight=(place[1], place[0]), boxes=boxes, storage_locations=storage_locations)
         else:
-            return redirect(url_for('index', message="Box not found."))
+            cursor.close()
+            conn.close()
+            return render_template('index.html', message="Kiste nicht gefunden.", highlight=None, boxes=boxes, storage_locations=storage_locations)
     else:
         return "Database connection failed."
 
@@ -107,7 +113,7 @@ def delete_box():
     else:
         return "Database connection failed."
 
-@app.route('/manage')
+@app.route('/manage', methods=['GET', 'POST'])
 def manage_boxes():
     conn = get_db_connection()
     if conn:
@@ -177,10 +183,25 @@ def delete_box_route(projektnummer):
         return "Database connection failed."
 
 @app.route('/edit_box/<projektnummer>', methods=['GET', 'POST'])
-def edit_box(projektnummer):
+def edit_box_route(projektnummer):
     if request.method == 'POST':
-        # Handle form submission for editing box
-        pass
+        projektnummer = request.form['projektnummer']
+        kunde = request.form['kunde']
+        lagerplatz_id = request.form['lagerplatz_id']
+        conn = get_db_connection()
+        if conn:
+            cursor = conn.cursor()
+            cursor.execute("""
+                UPDATE boxes
+                SET kunde = %s, lagerplatz_id = %s
+                WHERE projektnummer = %s
+            """, (kunde, lagerplatz_id, projektnummer))
+            conn.commit()
+            cursor.close()
+            conn.close()
+            return redirect(url_for('index'))
+        else:
+            return "Database connection failed."
     else:
         # Render form for editing box
         pass
