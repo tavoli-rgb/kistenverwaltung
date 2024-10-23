@@ -150,7 +150,7 @@ def print_label(projektnummer, kunde, reihe, fach, boxnummer):
     return render_template('print_label.html', projektnummer=projektnummer, kunde=kunde, reihe=reihe, fach=fach, boxnummer=boxnummer)
 
 @app.route('/delete_box/<projektnummer>', methods=['POST'])
-def delete_box(projektnummer):
+def delete_box_route(projektnummer):
     conn = get_db_connection()
     if conn:
         cursor = conn.cursor()
