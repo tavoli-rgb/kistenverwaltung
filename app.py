@@ -231,6 +231,10 @@ def edit_box(projektnummer):
                 return "Box not found."
         else:
             return "Database connection failed."
+@app.route('/testansicht')
+def testansicht():
+    return render_template('testansicht.html')
+
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0')
