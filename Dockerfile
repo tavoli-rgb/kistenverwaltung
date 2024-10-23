@@ -4,10 +4,9 @@ FROM python:3.9-slim
 # Set the working directory in the container
 WORKDIR /app
 
-# Clone the repository and checkout the test branch
+# Install git and other dependencies
 RUN apt-get update && apt-get install -y git && \
-    git clone --branch test https://github.com/tavoli-rgb/kistenverwaltung.git . && \
-    apt-get remove -y git && apt-get autoremove -y && rm -rf /var/lib/apt/lists/*
+    apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # Install the necessary Python packages
 RUN pip install --no-cache-dir flask mysql-connector-python
@@ -18,5 +17,9 @@ EXPOSE 5000
 # Define environment variable
 ENV NAME World
 
-# Run app.py when the container launches
-CMD ["python", "app.py"]
+# Copy the entrypoint script into the container
+COPY entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
+
+# Run the entrypoint script when the container launches
+ENTRYPOINT ["/entrypoint.sh"]
