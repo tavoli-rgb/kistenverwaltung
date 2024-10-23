@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <title>Kiste bearbeiten</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f0f2f5;
+            color: #333;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            text-align: center;
+            color: #ff5722;
+        }
+        form {
+            display: flex;
+            flex-direction: column;
+        }
+        label {
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input {
+            margin-bottom: 15px;
+            padding: 10px;
+            font-size: 1em;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        .button-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 1em;
+            color: white;
+            background-color: #ff5722;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #e64a19;
+        }
+        .delete-button {
+            padding: 5px 10px;
+            background-color: #f44336;
+            margin-left: auto;
+            order: 2;
+        }
+        .delete-button:hover {
+            background-color: #d32f2f;
+        }
+        .message {
+            padding: 10px;
+            background-color: #fff3e0;
+            border: 1px solid #ff9800;
+            color: #333;
+            margin-bottom: 15px;
+            text-align: center;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Kiste bearbeiten</h1>
+        {% if message %}
+        <div class="message">{{ message }}</div>
+        {% endif %}
+        <form action="/edit_box/{{ box[0] }}" method="post" onsubmit="return closeWindow()">
+            <label for="projektnummer">Projektnummer</label>
+            <input type="text" id="projektnummer" name="projektnummer" value="{{ box[0] }}" readonly>
+            
+            <label for="kunde">Kunde</label>
+            <input type="text" id="kunde" name="kunde" value="{{ box[1] }}">
+            
+            <label for="box_id">Box Nummer</label>
+            <input type="text" id="box_id" name="box_id" value="{{ box[2] }}">
+            
+            <div class="button-container">
+                <button type="submit">Speichern</button>
+            </div>
+        </form>
+        <form action="/delete_box/{{ box[0] }}" method="post" onsubmit="return confirmDelete() && closeWindow()" style="margin-top: 15px;">
+            <button type="submit" class="delete-button">Löschen</button>
+        </form>
+    </div>
+    <script>
+        function closeWindow() {
+            setTimeout(function() {
+                window.opener.location.reload();
+                window.close();
+            }, 100);
+            return true;
+        }
+
+        function confirmDelete() {
+            return confirm('Sind Sie sicher, dass Sie diese Kiste löschen möchten?');
+        }
+    </script>
+</body>
+</html>

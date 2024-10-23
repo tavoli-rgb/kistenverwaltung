@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <title>Druckansicht</title>
+    <style>
+        @page {
+            size: A4;
+            margin: 10mm;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: calc(297mm - 20mm);
+            background-color: #fff;
+        }
+        .label {
+            text-align: center;
+            padding: 20px;
+            width: calc(210mm - 20mm);
+            height: calc(297mm - 20mm);
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #fff;
+            border: 2px solid #000;
+            border-radius: 10px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+        }
+        .projektnummer {
+            font-size: 100pt;
+            font-weight: bold;
+            color: #000;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #000;
+            padding-bottom: 10px;
+            width: 100%;
+        }
+        .kunde {
+            font-size: 45pt;
+            color: #000;
+            margin-bottom: 10px;
+            word-wrap: break-word;
+            hyphens: auto;
+        }
+        .boxnummer {
+            font-size: 45pt;
+            color: #000;
+            margin-bottom: 20px;
+        }
+        .details-container {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+            padding: 0 20px;
+        }
+        .details {
+            font-size: 22pt;
+            color: #000;
+        }
+        .details-left {
+            text-align: left;
+        }
+        .details-right {
+            text-align: right;
+        }
+    </style>
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            var kundeElement = document.querySelector('.kunde');
+            var kundeText = kundeElement.textContent;
+            kundeElement.innerHTML = kundeText.replace(/-/g, '-<br>');
+        });
+    </script>
+</head>
+<body>
+    <div class="label">
+        <div class="projektnummer">{{ projektnummer }}</div>
+        <div class="kunde">{{ kunde }}</div>
+        <div class="boxnummer">Box: {{ boxnummer }}</div>
+        <div class="details-container">
+            <div class="details details-left">
+                <div>Reihe:</div>
+                <div>{{ reihe }}</div>
+            </div>
+            <div class="details details-right">
+                <div>Fach:</div>
+                <div>{{ fach }}</div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
