@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Regalverwaltung</title>
+    <style>
+        .shelf {
+            display: grid;
+            grid-template-columns: repeat(10, 1fr); /* 10 Spalten */
+            gap: 10px;
+            padding: 20px;
+        }
+        .box {
+            border: 1px solid #ccc;
+            padding: 10px;
+            text-align: center;
+            background-color: #f9f9f9;
+        }
+        .highlight {
+            background-color: yellow;
+        }
+    </style>
+</head>
+<body>
+    <h1>Regalverwaltung</h1>
+    <div class="shelf">
+        {% for box in boxes %}
+            <div class="box {% if highlight and highlight == box[4] %}highlight{% endif %}">
+                <p>Projektnummer: {{ box[0] }}</p>
+                <p>Kunde: {{ box[1] }}</p>
+                <p>Reihe: {{ box[2] }}</p>
+                <p>Fach: {{ box[3] }}</p>
+            </div>
+        {% endfor %}
+    </div>
+</body>
+</html>
