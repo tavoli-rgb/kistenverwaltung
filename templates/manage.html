@@ -1,9 +1,8 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="de">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Manage Boxes</title>
+    <title>Kistenverwaltung</title>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
     <style>
         body {
@@ -110,21 +109,51 @@
             white-space: nowrap;
         }
     </style>
+    <script>
+        window.onload = function() {
+            document.getElementById('projektnummer').focus();
+        };
+
+        function openPrintWindow(projektnummer, kunde, reihe, fach, boxnummer) {
+            const url = `/print_label/${projektnummer}/${kunde}/${reihe}/${fach}/${boxnummer}`;
+            const printWindow = window.open(url, '_blank', 'width=800,height=600');
+            printWindow.focus();
+        }
+
+        function editBox(projektnummer) {
+            const url = `/edit_box/${projektnummer}`;
+            const editWindow = window.open(url, '_blank', 'width=800,height=600');
+            editWindow.focus();
+        }
+
+        function validateAddForm() {
+            const projektnummer = document.getElementById('add_projektnummer').value;
+            const kunde = document.getElementById('add_kunde').value;
+            if (projektnummer.trim() === '') {
+                alert('Das Feld Projektnummer darf nicht leer sein.');
+                return false;
+            }
+            if (kunde.trim() === '') {
+                alert('Das Feld Kunde darf nicht leer sein.');
+                return false;
+            }
+            return true;
+        }
+    </script>
 </head>
 <body>
     <div class="container">
-        <h1>Manage Boxes</h1>
         <div class="form-container">
+            <!-- Form to search for a project number -->
+            <form action="/find_manage" method="post">
+                <input type="text" id="projektnummer" name="projektnummer" placeholder="Projektnummer">
+                <button type="submit">Suchen</button>
+            </form>
             <!-- Form to add a new project number -->
-            <form action="{{ url_for('add_box') }}" method="post">
-                <input type="text" name="projektnummer" placeholder="Projektnummer" required>
-                <input type="text" name="kunde" placeholder="Kunde" required>
-                <select name="lagerplatz_id" required>
-                    {% for location in storage_locations %}
-                        <option value="{{ location[0] }}">{{ location[1] }} - {{ location[2] }}</option>
-                    {% endfor %}
-                </select>
-                <button type="submit">Add Box</button>
+            <form action="/manage" method="post" onsubmit="return validateAddForm()">
+                <input type="text" id="add_projektnummer" name="projektnummer" placeholder="Projektnummer" required>
+                <input type="text" id="add_kunde" name="kunde" placeholder="Kunde" required>
+                <button type="submit" name="action" value="add">Hinzufügen</button>
             </form>
             <div class="message">{% if message %}{{ message }}{% else %}Keine Meldungen{% endif %}</div>
         </div>
@@ -132,33 +161,26 @@
             <table>
                 <tr>
                     <th class="narrow-column">Projektnummer</th>
+                    <th class="narrow-column">Box</th>
                     <th>Kunde</th>
                     <th class="narrow-column">Reihe</th>
                     <th class="narrow-column">Fach</th>
                     <th>Aktionen</th>
                 </tr>
                 {% for box in boxes %}
-                <tr class="{% if highlight and highlight[0] == box[2] and highlight[1] == box[3] %}highlight{% endif %}">
+                <tr class="{% if highlight and highlight[0] == box[2] and highlight[1] == box[3] %}highlight{% endif %}" onclick="editBox('{{ box[0] }}')">
                     <td class="narrow-column">{{ box[0] }}</td>
+                    <td class="narrow-column">{{ box[4] }}</td>
                     <td>{{ box[1] }}</td>
                     <td class="narrow-column">{{ box[2] }}</td>
                     <td class="narrow-column">{{ box[3] }}</td>
                     <td>
-                        <form action="{{ url_for('delete_box', projektnummer=box[0]) }}" method="post" style="display:inline;">
-                            <button type="submit">Löschen</button>
-                        </form>
-                        <a href="{{ url_for('edit_box', projektnummer=box[0]) }}">Bearbeiten</a>
-                        <button type="button" onclick="openPrintWindow('{{ box[0] }}', '{{ box[1] }}', '{{ box[2] }}', '{{ box[3] }}', '{{ box[4] }}')">Drucken</button>
+                        <button type="button" onclick="event.stopPropagation(); openPrintWindow('{{ box[0] }}', '{{ box[1] }}', '{{ box[2] }}', '{{ box[3] }}', '{{ box[4] }}')">Drucken</button>
                     </td>
                 </tr>
                 {% endfor %}
             </table>
         </div>
     </div>
-    <script>
-        function openPrintWindow(projektnummer, kunde, reihe, fach, boxnummer) {
-            window.open(`/print_label/${projektnummer}/${kunde}/${reihe}/${fach}/${boxnummer}`, '_blank');
-        }
-    </script>
 </body>
 </html>
